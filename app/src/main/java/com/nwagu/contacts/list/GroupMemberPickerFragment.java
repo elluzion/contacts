@@ -280,7 +280,6 @@ public class GroupMemberPickerFragment extends
         final boolean isSelectionMode = activity == null ? false : activity.isSelectionMode();
 
         // Added in ContactSelectionActivity but we must account for selection mode
-        setVisible(menu, R.id.menu_search, !isSearchMode && !isSelectionMode);
         setVisible(menu, R.id.menu_select, hasContacts && !isSearchMode && !isSelectionMode);
     }
 

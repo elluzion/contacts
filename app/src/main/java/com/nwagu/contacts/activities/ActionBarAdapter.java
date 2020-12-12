@@ -81,7 +81,6 @@ public class ActionBarAdapter implements OnCloseListener {
     private String mQueryString;
 
     private EditText mSearchView;
-    private View mClearSearchView;
     private View mSearchContainer;
     private View mSelectionContainer;
 
@@ -153,27 +152,6 @@ public class ActionBarAdapter implements OnCloseListener {
         mSearchView = (EditText) mSearchContainer.findViewById(R.id.search_view);
         mSearchView.setHint(mActivity.getString(mSearchHintResId));
         mSearchView.addTextChangedListener(new SearchTextWatcher());
-        final ImageButton searchBackButton = (ImageButton) mSearchContainer
-                .findViewById(R.id.search_back_button);
-        searchBackButton.setOnClickListener(
-                new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onUpButtonPressed();
-                }
-            }
-        });
-        searchBackButton.getDrawable().setAutoMirrored(true);
-
-        mClearSearchView = mSearchContainer.findViewById(R.id.search_close_button);
-        mClearSearchView.setOnClickListener(
-                new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setQueryString(null);
-            }
-        });
 
         // Setup selection bar
         mSelectionContainer = inflater.inflate(R.layout.selection_bar, mToolbar,
@@ -194,11 +172,11 @@ public class ActionBarAdapter implements OnCloseListener {
 
     public void initialize(Bundle savedState, ContactsRequest request) {
         if (savedState == null) {
-            mSearchMode = request.isSearchMode();
+            mSearchMode = true;
             mQueryString = request.getQueryString();
             mSelectionMode = false;
         } else {
-            mSearchMode = savedState.getBoolean(EXTRA_KEY_SEARCH_MODE);
+            mSearchMode = true;
             mSelectionMode = savedState.getBoolean(EXTRA_KEY_SELECTED_MODE);
             mQueryString = savedState.getString(EXTRA_KEY_QUERY);
         }
@@ -231,8 +209,6 @@ public class ActionBarAdapter implements OnCloseListener {
             } else if (mListener != null) {
                 mListener.onAction(Action.CHANGE_SEARCH_QUERY);
             }
-            mClearSearchView.setVisibility(
-                    TextUtils.isEmpty(queryString) ? View.GONE : View.VISIBLE);
         }
 
         @Override
@@ -268,15 +244,9 @@ public class ActionBarAdapter implements OnCloseListener {
             }
             if (mSearchMode) {
                 mSearchView.setEnabled(true);
-                setFocusOnSearchView();
             } else {
-                // Disable search view, so that it doesn't keep the IME visible.
-                mSearchView.setEnabled(false);
             }
             setQueryString(null);
-        } else if (flag) {
-            // Everything is already set up. Still make sure the keyboard is up
-            if (mSearchView != null) setFocusOnSearchView();
         }
     }
 
@@ -380,7 +350,6 @@ public class ActionBarAdapter implements OnCloseListener {
         // to adding the desired container.
         if (skipAnimation || isSwitchingFromSearchToSelection) {
             if (isTabHeightChanging || isSwitchingFromSearchToSelection) {
-                mToolbar.removeView(mSearchContainer);
                 mToolBarFrame.removeView(mSelectionContainer);
                 if (mSelectionMode) {
                     addSelectionContainer();
@@ -410,26 +379,6 @@ public class ActionBarAdapter implements OnCloseListener {
                     public void run() {
                         updateDisplayOptions(isSearchModeChanging);
                         mToolBarFrame.removeView(mSelectionContainer);
-                    }
-                });
-            }
-        }
-
-        // Handle a switch to/from search mode, due to UI interaction.
-        if (isSearchModeChanging) {
-            if (mSearchMode) {
-                addSearchContainer();
-                mSearchContainer.setAlpha(0);
-                mSearchContainer.animate().alpha(1).setDuration(mActionBarAnimationDuration);
-                updateDisplayOptions(isSearchModeChanging);
-            } else {
-                mSearchContainer.setAlpha(1);
-                mSearchContainer.animate().alpha(0).setDuration(mActionBarAnimationDuration)
-                        .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateDisplayOptions(isSearchModeChanging);
-                        mToolbar.removeView(mSearchContainer);
                     }
                 });
             }
@@ -550,7 +499,6 @@ public class ActionBarAdapter implements OnCloseListener {
 
     private void updateDisplayOptions(boolean isSearchModeChanging) {
         if (mSearchMode && !mSelectionMode) {
-            setFocusOnSearchView();
             // Since we have the {@link SearchView} in a custom action bar, we must manually handle
             // expanding the {@link SearchView} when a search is initiated. Note that a side effect
             // of this method is that the {@link SearchView} query text is set to empty string.
@@ -577,7 +525,7 @@ public class ActionBarAdapter implements OnCloseListener {
 
     @Override
     public boolean onClose() {
-        setSearchMode(false);
+        setSearchMode(true);
         return false;
     }
 
@@ -585,11 +533,6 @@ public class ActionBarAdapter implements OnCloseListener {
         outState.putBoolean(EXTRA_KEY_SEARCH_MODE, mSearchMode);
         outState.putBoolean(EXTRA_KEY_SELECTED_MODE, mSelectionMode);
         outState.putString(EXTRA_KEY_QUERY, mQueryString);
-    }
-
-    public void setFocusOnSearchView() {
-        mSearchView.requestFocus();
-        showInputMethod(mSearchView); // Workaround for the "IME not popping up" issue.
     }
 
     private void showInputMethod(View view) {

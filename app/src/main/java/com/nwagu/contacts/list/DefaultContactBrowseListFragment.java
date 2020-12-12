@@ -666,9 +666,6 @@ public class DefaultContactBrowseListFragment extends ContactBrowseListFragment
                 R.string.enter_contact_name);
         mActionBarAdapter.setShowHomeIcon(true);
         initializeActionBarAdapter(savedInstanceState);
-        if (isSearchMode()) {
-            mActionBarAdapter.setFocusOnSearchView();
-        }
 
         setCheckBoxListListener(new CheckBoxListListener());
         setOnContactListActionListener(new ContactBrowserActionListener());
@@ -1009,8 +1006,7 @@ public class DefaultContactBrowseListFragment extends ContactBrowseListFragment
 
         final boolean isSearchOrSelectionMode = mActionBarAdapter.isSearchMode()
                 || mActionBarAdapter.isSelectionMode();
-        makeMenuItemVisible(menu, R.id.menu_search, !isSearchOrSelectionMode);
-
+                
         final boolean showSelectedContactOptions = mActionBarAdapter.isSelectionMode()
                 && getSelectedContactIds().size() != 0;
         makeMenuItemVisible(menu, R.id.menu_share, showSelectedContactOptions);
@@ -1060,11 +1056,6 @@ public class DefaultContactBrowseListFragment extends ContactBrowseListFragment
             if (mActionBarAdapter.isUpShowing()) {
                 // "UP" icon press -- should be treated as "back".
                 mActivity.onBackPressed();
-            }
-            return true;
-        } else if (id == R.id.menu_search) {
-            if (!mActionBarAdapter.isSelectionMode()) {
-                mActionBarAdapter.setSearchMode(true);
             }
             return true;
         } else if (id == R.id.menu_share) {

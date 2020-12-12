@@ -165,7 +165,6 @@
         <!-- Popup menu -->
         <item name="android:popupMenuStyle">@style/PopupMenuStyleAppCompat</item>
         <item name="popupMenuStyle">@style/PopupMenuStyleAppCompat</item>
-        <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/primary_color</item>
     </style>
 
@@ -559,7 +558,6 @@ background and text color. See also android:style/Widget.Holo.TextView.ListSepar
         <item name="android:textAlignment">viewStart</item>
         <item name="android:layout_marginStart">@dimen/drawer_item_text_margin</item>
         <item name="android:layout_marginEnd">@dimen/drawer_item_text_margin</item>
-
     </style>
 
     <style name="DrawerTextStyle">

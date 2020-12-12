@@ -17,6 +17,6 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
   <item android:state_activated="true"
-        android:drawable="@color/drawer_selected_color"/>
+        android:drawable="@color/drawer_item_active_bg_color" />
   <item android:drawable="@drawable/ripple_background" />
 </selector>

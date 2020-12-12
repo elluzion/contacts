@@ -1032,7 +1032,7 @@ public class ContactListItemView extends ViewGroup
                 getResources().getDrawable(R.drawable.quantum_ic_star_vd_theme_24,
                         getContext().getTheme()));
         headerImageView.setImageTintList(ColorStateList.valueOf(getResources()
-                .getColor(R.color.material_star_pink)));
+                .getColor(R.color.material_star)));
         headerImageView.setContentDescription(
                 getContext().getString(R.string.contactsFavoritesLabel));
         headerImageView.setVisibility(View.VISIBLE);

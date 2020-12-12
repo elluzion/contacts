@@ -33,7 +33,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,7 +71,7 @@ import java.util.ArrayList;
  */
 public class ContactSelectionActivity extends AppCompatContactsActivity implements
         View.OnCreateContextMenuListener, ActionBarAdapter.Listener, OnClickListener,
-        OnFocusChangeListener, OnCheckBoxListActionListener {
+        OnCheckBoxListActionListener {
     private static final String TAG = "ContactSelection";
 
     private static final String KEY_ACTION_CODE = "actionCode";
@@ -108,10 +107,10 @@ public class ContactSelectionActivity extends AppCompatContactsActivity implemen
         super.onCreate(savedState);
 
         RequestPermissionsActivity.startPermissionActivityIfNeeded(this);
-
+        mIsSearchMode = true;
+        
         if (savedState != null) {
             mActionCode = savedState.getInt(KEY_ACTION_CODE);
-            mIsSearchMode = savedState.getBoolean(KEY_SEARCH_MODE);
         }
 
         // Extract relevant information from the intent
@@ -174,9 +173,6 @@ public class ContactSelectionActivity extends AppCompatContactsActivity implemen
         if (id == android.R.id.home) {// Go back to previous screen, intending "cancel"
             setResult(RESULT_CANCELED);
             onBackPressed();
-        } else if (id == R.id.menu_search) {
-            mIsSearchMode = !mIsSearchMode;
-            configureSearchMode();
         } else {
             return super.onOptionsItemSelected(item);
         }
@@ -432,7 +428,6 @@ public class ContactSelectionActivity extends AppCompatContactsActivity implemen
     public void onAction(int action) {
         switch (action) {
             case ActionBarAdapter.Listener.Action.START_SEARCH_MODE:
-                mIsSearchMode = true;
                 configureSearchMode();
                 break;
             case ActionBarAdapter.Listener.Action.CHANGE_SEARCH_QUERY:
@@ -626,15 +621,6 @@ public class ContactSelectionActivity extends AppCompatContactsActivity implemen
         finish();
     }
 
-    @Override
-    public void onFocusChange(View view, boolean hasFocus) {
-        if (view.getId() == R.id.search_view) {
-            if (hasFocus) {
-                mActionBarAdapter.setFocusOnSearchView();
-            }
-        }
-    }
-
     public void returnPickerResult(Uri data) {
         Intent intent = new Intent();
         intent.setData(data);
@@ -680,16 +666,7 @@ public class ContactSelectionActivity extends AppCompatContactsActivity implemen
         super.onCreateOptionsMenu(menu);
 
         final MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.search_menu, menu);
 
-        final MenuItem searchItem = menu.findItem(R.id.menu_search);
-        searchItem.setVisible(!mIsSearchMode && mIsSearchSupported);
-
-        final Drawable searchIcon = searchItem.getIcon();
-        if (searchIcon != null) {
-            searchIcon.mutate().setColorFilter(ContextCompat.getColor(this,
-                    R.color.actionbar_icon_color), PorterDuff.Mode.SRC_ATOP);
-        }
         return true;
     }
 
@@ -705,7 +682,6 @@ public class ContactSelectionActivity extends AppCompatContactsActivity implemen
                 getMultiSelectListFragment().displayCheckBoxes(false);
             }
         } else if (mIsSearchMode) {
-            mIsSearchMode = false;
             configureSearchMode();
         } else {
             super.onBackPressed();
